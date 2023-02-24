@@ -28,3 +28,4 @@ export declare class AudioCanvas {
     private roundedRect;
     private draw;
 }
+export default AudioCanvas;

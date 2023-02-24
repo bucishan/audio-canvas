@@ -115,3 +115,4 @@ export class AudioCanvas {
         (_f = this.canvasCtx) === null || _f === void 0 ? void 0 : _f.restore(); //恢复初始的状态
     }
 }
+export default AudioCanvas;

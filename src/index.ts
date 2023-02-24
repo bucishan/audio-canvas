@@ -144,3 +144,5 @@ export class AudioCanvas {
         this.canvasCtx?.restore();//恢复初始的状态
     }
 }
+
+export default AudioCanvas;
