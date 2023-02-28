@@ -2,11 +2,12 @@
   "name": "audio-canvas",
   "version": "1.0.2",
   "description": "audio to canvan animation",
-  "main": "dist/index.js",
-  "types": "dist",
+  "main": "dist/audio-canvas.js",
+  "type": "module",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "rollup -c"
   },
   "keywords": [
     "audio",
@@ -20,6 +21,13 @@
   "author": "Mountains",
   "license": "MIT",
   "files": [
-    "lib"
-  ]
+    "dist"
+  ],
+  "devDependencies": {
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.0.0"
+  }
 }

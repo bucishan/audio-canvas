@@ -1,4 +1,8 @@
 "use strict";
+interface CanvasOption{
+    width?:number;
+    height?:number;
+}
 
 interface BaseConfig {
     audio?: HTMLAudioElement;
@@ -16,6 +20,7 @@ interface BaseConfig {
     barWidth?: number;
     barMinHeight?: number;
     barCount?: number;
+    canvasOption?:CanvasOption;
     useDataAvg?: boolean;
     useDataAcoustic?: boolean;
 
@@ -37,6 +42,7 @@ class Config implements BaseConfig {
     public barWidth: number = 5;
     public barMinHeight: number = 1;
     public barCount: number = 100;
+    public canvasOption:CanvasOption = {};
     public useDataAvg: boolean = true;
     public useDataAcoustic: boolean = true;
 
@@ -52,4 +58,5 @@ class Config implements BaseConfig {
 export {
     BaseConfig,
     Config,
+    CanvasOption
 }
