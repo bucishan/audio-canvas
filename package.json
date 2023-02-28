@@ -21,7 +21,10 @@
   "author": "Mountains",
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENSE"
   ],
   "devDependencies": {
     "@rollup/plugin-babel": "^6.0.3",
