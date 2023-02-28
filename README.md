@@ -4,13 +4,13 @@
 
 ```
   npm install audio-canvas
-  OR
-  <script src="./dist/audio-canvas.umd.js">
 ```
 
 ## 2.use
 
 ```
+  <script src="./dist/audio-canvas.umd.js">
+  OR
   import AudioCanvas from 'audio-canvas';
   
   const ac = new AudioCanvas(option);
