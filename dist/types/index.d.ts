@@ -9,4 +9,4 @@ declare class AudioCanvas extends Config {
     private audioPause;
     private draw;
 }
-export { AudioCanvas as default };
+export { AudioCanvas as default, };

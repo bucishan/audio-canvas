@@ -1,7 +1,13 @@
+/**
+ * canvas配置属性
+ */
 interface CanvasOption {
-    width?: number;
-    height?: number;
+    width: number;
+    height: number;
 }
+/**
+ * 基础配置
+*/
 interface BaseConfig {
     audio?: HTMLAudioElement;
     canvas?: HTMLCanvasElement;
@@ -18,8 +24,9 @@ interface BaseConfig {
     barMinHeight?: number;
     barCount?: number;
     canvasOption?: CanvasOption;
-    useDataAvg?: boolean;
+    useDataAverage?: boolean;
     useDataAcoustic?: boolean;
+    useEffect?: string;
 }
 declare class Config implements BaseConfig {
     audio?: HTMLAudioElement;
@@ -37,11 +44,11 @@ declare class Config implements BaseConfig {
     barMinHeight: number;
     barCount: number;
     canvasOption: CanvasOption;
-    useDataAvg: boolean;
+    useDataAverage: boolean;
     useDataAcoustic: boolean;
+    useEffect: string;
     protected raf: number;
     protected isInit: boolean;
-    protected AudioContext: any;
     constructor(params?: BaseConfig);
 }
-export { BaseConfig, Config, CanvasOption };
+export { BaseConfig, Config, };

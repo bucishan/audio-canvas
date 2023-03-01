@@ -41,7 +41,7 @@ export default [
                 // file: 'dist/audio-canvas.esm.js',
             },
             {
-                // 通用模块定义，作为 和多合一工作amdcjsiife
+                // 通用模块定义，作为 和多合一工作amd、cjs、iife
                 format: 'umd',
                 file: 'dist/audio-canvas.umd.js',
                 // exports: 'named',
@@ -50,12 +50,4 @@ export default [
             },
         ],
     },
-    // {
-    //     input:'src/index.ts',
-    //     plugins: [dts()],
-    //     output: {
-    //         format: 'esm',
-    //         file: 'dist/types/audio-canvas.d.ts',
-    //     },
-    // },
 ];

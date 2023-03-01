@@ -1,9 +1,16 @@
 "use strict";
-interface CanvasOption{
-    width?:number;
-    height?:number;
+
+/**
+ * canvas配置属性
+ */
+interface CanvasOption {
+    width: number;
+    height: number;
 }
 
+/** 
+ * 基础配置
+*/
 interface BaseConfig {
     audio?: HTMLAudioElement;
     canvas?: HTMLCanvasElement;
@@ -20,9 +27,10 @@ interface BaseConfig {
     barWidth?: number;
     barMinHeight?: number;
     barCount?: number;
-    canvasOption?:CanvasOption;
-    useDataAvg?: boolean;
+    canvasOption?: CanvasOption;
+    useDataAverage?: boolean;
     useDataAcoustic?: boolean;
+    useEffect?: string;
 
 }
 
@@ -37,18 +45,18 @@ class Config implements BaseConfig {
     public gradient?: CanvasGradient;
     public fillStyle?: (string | CanvasGradient | CanvasPattern);
 
-    public fftSize: number = 2048;
+    public fftSize: number = 2048;  //必须是2的幂，最大值，Math.pow(2,15)
     public circleRadius: number = 100;
     public barWidth: number = 5;
     public barMinHeight: number = 1;
     public barCount: number = 100;
-    public canvasOption:CanvasOption = {};
-    public useDataAvg: boolean = true;
+    public canvasOption: CanvasOption = { width: 300, height: 300 };
+    public useDataAverage: boolean = true;
     public useDataAcoustic: boolean = true;
+    public useEffect: string = 'default';
 
     protected raf: number = 0;
     protected isInit: boolean = false;
-    protected AudioContext: any = window.AudioContext;
 
     constructor(params?: BaseConfig) {
         Object.assign(this, params);
@@ -58,5 +66,5 @@ class Config implements BaseConfig {
 export {
     BaseConfig,
     Config,
-    CanvasOption
+    // CanvasOption
 }
