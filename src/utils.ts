@@ -1,23 +1,84 @@
 "use strict";
 
 // canvas绘制圆角矩形
-const roundedRect = (canvasCtx: (CanvasRenderingContext2D | null), x: number, y: number, width: number, height: number, radius: number): void => {
-    canvasCtx?.beginPath();
-    if (Math.max(width, height) / 2 <= radius) {
-        radius = height / 2;
+const roundedRect = (canvasCtx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number): void => {
+    canvasCtx.beginPath();
+    if (height / 2 < radius) {
+        radius = 0;
     }
-    if (width <= 0 || height <= 0) {
-        canvasCtx?.arc(x, y, radius, 0, Math.PI * 2);
-    } else {
-        canvasCtx?.moveTo(x + radius, y);
-        canvasCtx?.arcTo(x + width, y, x + width, y + height, radius);
-        canvasCtx?.arcTo(x + width, y + height, x, y + height, radius);
-        canvasCtx?.arcTo(x, y + height, x, y, radius);
-        canvasCtx?.arcTo(x, y, x + radius, y, radius);
+    if (width > 0 && height > 0) {
+        canvasCtx.moveTo(x + radius, y);
+        canvasCtx.arcTo(x + width, y, x + width, y + height, radius);
+        canvasCtx.arcTo(x + width, y + height, x, y + height, radius);
+        canvasCtx.arcTo(x, y + height, x, y, radius);
+        canvasCtx.arcTo(x, y, x + radius, y, radius);
     }
-    canvasCtx?.closePath();
-    canvasCtx?.fill();
+    canvasCtx.closePath();
+    canvasCtx.fill();
 }
+
+let isInit = false;
+let buffer: Array<[number, number]> = [];
+let data: Array<[number, number]> = [];
+const jumpCricle = (canvasCtx: CanvasRenderingContext2D, audioByteData: Array<number>, petal: number, radius: number, pole: [number, number], α: number): void => {
+    // const color = color;
+
+
+    const __rotate = (p: Array<number>, cosα: number, sinα: number): [number, number] => {
+        return [p[0] * cosα - p[1] * sinα, p[1] * cosα + p[0] * sinα];
+    }
+
+    if (!isInit) {
+        const θ = 2 * Math.PI / petal;
+        const cosθ = Math.cos(θ);
+        const sinθ = Math.sin(θ);
+        const h = radius * (4 * (1 - Math.cos(θ / 2))) / (3 * Math.sin(θ / 2));
+        const A = [radius, 0];
+        const B = [radius, h];
+        const C = [radius * cosθ + h * sinθ, radius * sinθ - h * cosθ];
+        for (let i = 0, idx = 0; i < petal; ++i, idx += 3) {
+            const cosNθ = Math.cos(i * θ + α);
+            const sinNθ = Math.sin(i * θ + α);
+            data[idx] = __rotate(A, cosNθ, sinNθ);
+            data[idx + 1] = __rotate(B, cosNθ, sinNθ);
+            data[idx + 2] = __rotate(C, cosNθ, sinNθ);
+        }
+        data.forEach((v, i) => { buffer[i] = [v[0] + pole[0], v[1] + pole[1]]; });
+        buffer[buffer.length] = buffer[0];
+
+        isInit = true;
+    }
+
+
+    // const update = () => {
+    for (let i = data.length; i--;) {
+        buffer[i][0] = data[i][0] * audioByteData[i] + pole[0];
+        buffer[i][1] = data[i][1] * audioByteData[i] + pole[1];
+    }
+    // }
+
+    // 绘制
+    canvasCtx.moveTo(...buffer[0]);
+    canvasCtx.beginPath();
+    canvasCtx.strokeStyle = 'blue';
+    for (let i = 0, idx = 0; i < petal; ++i, idx += 3) {
+        const A = buffer[idx];
+        const B = buffer[idx + 1];
+        const C = buffer[idx + 2];
+        const D = buffer[idx + 3];
+        canvasCtx.lineTo(...A);
+        canvasCtx.bezierCurveTo(...B, ...C, ...D);
+        // 标出所有点
+        // canvasCtx.fillStyle = `hsl(${Math.floor(Math.random() * 360)}, 60%, 60%)`;
+        // canvasCtx.fillRect(A[0] - 2, A[1] - 2, 4, 4);
+        // canvasCtx.fillRect(B[0] - 2, B[1] - 2, 4, 4);
+        // canvasCtx.fillRect(C[0] - 2, C[1] - 2, 4, 4);
+    }
+    canvasCtx.closePath();
+    canvasCtx.fillStyle = '#888888';
+    canvasCtx.fill();
+}
+
 
 /**
  * 
@@ -83,5 +144,6 @@ const getAudioDataArray = (audioByteData: Uint8Array, barCount: number, useDataA
 
 export default {
     roundedRect,
+    jumpCricle,
     getAudioDataArray,
 }

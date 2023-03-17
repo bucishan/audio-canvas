@@ -11,7 +11,7 @@ export default [
             // 使用的插件
             resolve(),
             commonjs(),
-            typescript({ tslib: 'ES2015' }),
+            typescript({ tslib: 'ES2015',  }),
             babel({
                 babelHelpers: 'bundled',
                 exclude: "node_modules/**",
@@ -31,13 +31,14 @@ export default [
                 // CommonJS，适用于 Node 和其他捆绑器
                 format: 'cjs',
                 file: 'dist/audio-canvas.cjs.js',
+                // sourcemap: true,
             },
             {
                 // 将捆绑包保留为 ES 模块文件，适用于其他捆绑器，并作为标签包含在现代浏览器中（别名：，<script type=module>esmmodule)
                 format: 'es',
                 file: 'dist/audio-canvas.js',
                 name: 'AudioCanvas',
-                // exports: 'named'
+                exports: 'named'
                 // file: 'dist/audio-canvas.esm.js',
             },
             {
@@ -46,6 +47,7 @@ export default [
                 file: 'dist/audio-canvas.umd.js',
                 // exports: 'named',
                 name: 'AudioCanvas',
+                // sourcemap: true,
                 // plugins: [terser()]
             },
         ],

@@ -1,6 +1,6 @@
 "use strict";
 
-import { Config, BaseConfig } from './config';
+import { Config, BaseConfig, EffectOptionDefault } from './config';
 import { effectsMap } from './effects'
 
 /**
@@ -17,21 +17,14 @@ class AudioCanvas extends Config {
         if (this.isInit) {
             return;
         }
-        if (!this.canvas) {
-            console.error('the canvas element is undefined');
-            return;
-        }
+
         if (!this.audio) {
             console.error('the audio element is undefined');
             return;
         }
 
         try {
-
-            Object.assign(this.canvas, this.canvasOption );
-
             this.audioCtx = new AudioContext();
-            this.canvasCtx = this.canvas.getContext('2d')!;
 
             this.source = this.audioCtx?.createMediaElementSource(this.audio);
             this.analyser = this.audioCtx?.createAnalyser();
@@ -41,20 +34,45 @@ class AudioCanvas extends Config {
             this.source?.connect(this.analyser!);
             this.analyser?.connect(this.audioCtx!.destination);
 
-            //绘制默认样式
-            this.gradient = this.canvasCtx?.createLinearGradient(0, -this.circleRadius, 0, -Math.min(this.canvas.width, this.canvas.height) / 2);
-            this.gradient?.addColorStop(0, '#40E0D0');
-            this.gradient?.addColorStop(0.5, '#FF8C00');
-            this.gradient?.addColorStop(1, '#FF0080');
+            //遍历初始化canvas
+            for (let index = 0; index < this.effectOptions.length; index++) {
+
+                this.effectOptions[index] = Object.assign({}, EffectOptionDefault, this.effectOptions[index]);
+                const effectOption = this.effectOptions[index];
+
+                if (!effectOption.canvas) {
+                    console.error('the canvas element is undefined');
+                    return;
+                }
+
+                effectOption.canvasCtx = effectOption.canvas.getContext('2d')!;
+
+                Object.assign(effectOption.canvas!,effectOption.canvasOption);
+            }
+            window.addEventListener('resize', this.winResize.bind(this), false);
 
             this.audio.addEventListener('play', this.audioPlay.bind(this), false);
             this.audio.addEventListener('pause', this.audioPause.bind(this), false);
-
             this.isInit = true;
         } catch (error) {
             console.log('error :>> ', error || 'init error');
         }
     }
+    // 页面尺寸变化
+    private winResize() {
+        for (let index = 0; index < this.effectOptions.length; index++) {
+            const effectOption = this.effectOptions[index];
+            if (effectOption.followResize && effectOption.followResizeElement) {
+
+                effectOption.canvasOption = {
+                    width: document.querySelector(effectOption.followResizeElement)?.clientWidth || effectOption.canvasOption.width,
+                    height: document.querySelector(effectOption.followResizeElement)?.clientHeight || effectOption.canvasOption.height
+                };
+                Object.assign(effectOption.canvas!,effectOption.canvasOption);
+            }
+        }
+    }
+
     //音频播放事件
     private audioPlay() {
         if (this.isInit) {
@@ -69,11 +87,17 @@ class AudioCanvas extends Config {
     }
 
     private draw() {
-        const fn = effectsMap.get(this.useEffect);
-        if (fn) {
-            fn(this);
+
+        for (let index = 0; index < this.effectOptions.length; index++) {
+            const effectOption = this.effectOptions[index];
+            const fn = effectsMap.get(effectOption.useEffect);
+            if (fn) {
+                fn(this, effectOption);
+            }
         }
+
         this.raf = requestAnimationFrame(this.draw.bind(this));
+
     }
 }
 

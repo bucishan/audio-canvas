@@ -5,6 +5,7 @@ import { Config, BaseConfig } from './config';
 declare class AudioCanvas extends Config {
     constructor(params?: BaseConfig);
     init(params?: BaseConfig): void;
+    private winResize;
     private audioPlay;
     private audioPause;
     private draw;

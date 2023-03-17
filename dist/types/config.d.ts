@@ -5,40 +5,11 @@ interface CanvasOption {
     width: number;
     height: number;
 }
-/**
- * 基础配置
-*/
-interface BaseConfig {
-    audio?: HTMLAudioElement;
+interface EffectOption {
     canvas?: HTMLCanvasElement;
-    audioCtx?: AudioContext;
     canvasCtx?: CanvasRenderingContext2D;
-    audioByteData?: Uint8Array;
-    source?: MediaElementAudioSourceNode;
-    analyser?: AnalyserNode;
     gradient?: CanvasGradient;
     fillStyle?: (string | CanvasGradient | CanvasPattern);
-    fftSize?: number;
-    circleRadius?: number;
-    barWidth?: number;
-    barMinHeight?: number;
-    barCount?: number;
-    canvasOption?: CanvasOption;
-    useDataAverage?: boolean;
-    useDataAcoustic?: boolean;
-    useEffect?: string;
-}
-declare class Config implements BaseConfig {
-    audio?: HTMLAudioElement;
-    canvas?: HTMLCanvasElement;
-    audioCtx?: AudioContext;
-    canvasCtx?: CanvasRenderingContext2D;
-    audioByteData?: Uint8Array;
-    source?: MediaElementAudioSourceNode;
-    analyser?: AnalyserNode;
-    gradient?: CanvasGradient;
-    fillStyle?: (string | CanvasGradient | CanvasPattern);
-    fftSize: number;
     circleRadius: number;
     barWidth: number;
     barMinHeight: number;
@@ -47,8 +18,32 @@ declare class Config implements BaseConfig {
     useDataAverage: boolean;
     useDataAcoustic: boolean;
     useEffect: string;
+    followResize: boolean;
+    followResizeElement?: string;
+}
+declare const EffectOptionDefault: EffectOption;
+/**
+ * 基础配置
+*/
+interface BaseConfig {
+    audio?: HTMLAudioElement;
+    audioCtx?: AudioContext;
+    audioByteData?: Uint8Array;
+    source?: MediaElementAudioSourceNode;
+    analyser?: AnalyserNode;
+    fftSize?: number;
+    effectOptions: Array<EffectOption>;
+}
+declare class Config implements BaseConfig {
+    audio?: HTMLAudioElement;
+    audioCtx?: AudioContext;
+    audioByteData?: Uint8Array;
+    source?: MediaElementAudioSourceNode;
+    analyser?: AnalyserNode;
+    fftSize: number;
+    effectOptions: Array<EffectOption>;
     protected raf: number;
     protected isInit: boolean;
     constructor(params?: BaseConfig);
 }
-export { BaseConfig, Config, };
+export { BaseConfig, Config, EffectOption, EffectOptionDefault, };
