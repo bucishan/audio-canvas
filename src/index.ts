@@ -3,6 +3,31 @@
 import { Config, BaseConfig, EffectOptionDefault } from './config';
 import { effectsMap } from './effects'
 
+
+var lastTime = 0;
+var vendors = ['webkit', 'moz'];
+for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+    window.requestAnimationFrame = (window as any)[vendors[i] + 'RequestAnimationFrame'];
+    window.cancelAnimationFrame = (window as any)[vendors[i] + 'CancelAnimationFrame'] || (window as any)[vendors[i] + 'CancelRequestAnimationFrame'];
+}
+if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = function (callback) {
+        var currentTime = new Date().getTime();
+        var timeToCall = Math.max(0, 16 - (currentTime - lastTime));
+        var id = window.setTimeout(function () {
+            callback(currentTime + timeToCall);
+        }, timeToCall);
+        lastTime = currentTime + timeToCall;
+        return id;
+    };
+}
+if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = function (id) {
+        clearTimeout(id);
+    };
+}
+
+
 /**
  * Audio to Canvas Animation
  */
@@ -24,6 +49,7 @@ class AudioCanvas extends Config {
         }
 
         try {
+            var AudioContext = window.AudioContext || (window as any).webkitAudioContext;
             this.audioCtx = new AudioContext();
 
             this.source = this.audioCtx?.createMediaElementSource(this.audio);
@@ -47,7 +73,7 @@ class AudioCanvas extends Config {
 
                 effectOption.canvasCtx = effectOption.canvas.getContext('2d')!;
 
-                Object.assign(effectOption.canvas!,effectOption.canvasOption);
+                Object.assign(effectOption.canvas!, effectOption.canvasOption);
             }
             window.addEventListener('resize', this.winResize.bind(this), false);
 
@@ -55,7 +81,7 @@ class AudioCanvas extends Config {
             this.audio.addEventListener('pause', this.audioPause.bind(this), false);
             this.isInit = true;
         } catch (error) {
-            console.log('error :>> ', error || 'init error');
+            console.error('error :>> ', error || 'init error');
         }
     }
     // 页面尺寸变化
@@ -68,7 +94,7 @@ class AudioCanvas extends Config {
                     width: document.querySelector(effectOption.followResizeElement)?.clientWidth || effectOption.canvasOption.width,
                     height: document.querySelector(effectOption.followResizeElement)?.clientHeight || effectOption.canvasOption.height
                 };
-                Object.assign(effectOption.canvas!,effectOption.canvasOption);
+                Object.assign(effectOption.canvas!, effectOption.canvasOption);
             }
         }
     }
@@ -83,7 +109,7 @@ class AudioCanvas extends Config {
 
     //音频暂停或停止事件
     private audioPause() {
-        cancelAnimationFrame(this.raf)
+        window.cancelAnimationFrame(this.raf)
     }
 
     private draw() {
@@ -96,7 +122,7 @@ class AudioCanvas extends Config {
             }
         }
 
-        this.raf = requestAnimationFrame(this.draw.bind(this));
+        this.raf = window.requestAnimationFrame(this.draw.bind(this));
 
     }
 }
