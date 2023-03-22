@@ -32,7 +32,11 @@ const drawPI = (base: Config, effectOption: EffectOption) => {
         const barHeight = data * (height / 2 - effectOption.circleRadius) / 255 || effectOption.barMinHeight;
 
         effectOption.canvasCtx?.rotate(2 * Math.PI / effectOption.barCount);
-        utils.roundedRect(effectOption.canvasCtx!, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+        if (effectOption.effectRaindrop) {
+            utils.raindrop(effectOption.canvasCtx!, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+        } else {
+            utils.drawStick(effectOption.canvasCtx!, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
+        }
     }
     effectOption.canvasCtx?.restore();
 }
@@ -61,7 +65,12 @@ const drawChart = (base: Config, effectOption: EffectOption) => {
 
         const x = i * (width - effectOption.barWidth) / (effectOption.barCount - 1);
         const y = height - barHeight;
-        effectOption.canvasCtx?.fillRect(x, y, effectOption.barWidth, barHeight);
+        // effectOption.canvasCtx?.fillRect(x, y, effectOption.barWidth, barHeight);
+        if (effectOption.effectRaindrop) {
+            utils.raindrop(effectOption.canvasCtx!, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+        } else {
+            utils.drawStick(effectOption.canvasCtx!, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
+        }
     }
 }
 

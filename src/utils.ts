@@ -1,16 +1,41 @@
 "use strict";
 
-// canvas绘制圆角矩形
-const roundedRect = (canvasCtx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number): void => {
+// canvas 绘制柱子
+const drawStick = (canvasCtx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, onlyTop: boolean = false): void => {
     canvasCtx.beginPath();
     if (height / 2 < radius) {
-        radius = 0;
+        radius = height / 2;
+        // radius = 0;
     }
     if (width > 0 && height > 0) {
         canvasCtx.moveTo(x + radius, y);
         canvasCtx.arcTo(x + width, y, x + width, y + height, radius);
-        canvasCtx.arcTo(x + width, y + height, x, y + height, radius);
-        canvasCtx.arcTo(x, y + height, x, y, radius);
+        // canvasCtx.arcTo(x + width, y + height, x, y + height, radius);
+
+        if (onlyTop) {
+            canvasCtx.lineTo(x + width, y + height);
+            canvasCtx.lineTo(x, y + height);
+        } else {
+            canvasCtx.arcTo(x + width, y + height, x, y + height, radius);
+            canvasCtx.arcTo(x, y + height, x, y, radius);
+        }
+        canvasCtx.arcTo(x, y, x + radius, y, radius);
+
+    }
+    canvasCtx.closePath();
+    canvasCtx.fill();
+}
+
+// 倒雨滴
+const raindrop = (canvasCtx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number): void => {
+    canvasCtx.beginPath();
+    if (height / 2 < radius) {
+        radius = height / 2;
+    }
+    if (width > 0 && height > 0) {
+        canvasCtx.moveTo(x + radius, y);
+        canvasCtx.arcTo(x + width, y, x + width, y + height, radius);
+        canvasCtx.lineTo(x + radius, y + height);
         canvasCtx.arcTo(x, y, x + radius, y, radius);
     }
     canvasCtx.closePath();
@@ -93,7 +118,7 @@ const jumpCricle = (canvasCtx: CanvasRenderingContext2D, audioByteData: Array<nu
 const getAudioDataArray = (audioByteData: Uint8Array, barCount: number, useDataAcoustic: boolean, useDataAverage: boolean)
     : { step: number, audioDataArray: Uint8Array, audioDataArrayStep: Uint8Array } => {
 
-    let audioDataArray = audioByteData.slice(0, audioByteData.length / 2);
+    let audioDataArray = audioByteData.slice(0, audioByteData.length / 3);
     if (useDataAcoustic) {
         const dataArrayReverse = [...audioDataArray].reverse();
         audioDataArray = new Uint8Array([...dataArrayReverse, ...audioDataArray])
@@ -143,7 +168,8 @@ const getAudioDataArray = (audioByteData: Uint8Array, barCount: number, useDataA
 // }
 
 export default {
-    roundedRect,
+    drawStick,
+    raindrop,
     jumpCricle,
     getAudioDataArray,
 }

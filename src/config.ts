@@ -8,12 +8,12 @@ interface CanvasOption {
     height: number;
 }
 
+
 interface EffectOption {
     canvas?: HTMLCanvasElement;
     canvasCtx?: CanvasRenderingContext2D;
     gradient?: CanvasGradient;
     fillStyle?: (string | CanvasGradient | CanvasPattern);
-    // fftSize?: number;
     circleRadius: number;
     barWidth: number;
     barMinHeight: number;
@@ -22,6 +22,8 @@ interface EffectOption {
     useDataAverage: boolean;
     useDataAcoustic: boolean;
     useEffect: string;
+    effectOnlyHead:boolean;
+    effectRaindrop:boolean,
     followResize: boolean;
     followResizeElement?: string;
 }
@@ -35,6 +37,8 @@ const EffectOptionDefault: EffectOption = {
     useDataAverage: true,
     useDataAcoustic: true,
     useEffect: 'default',
+    effectOnlyHead:false,
+    effectRaindrop:false,
     followResize: false,
 }
 

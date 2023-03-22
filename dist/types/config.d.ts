@@ -18,6 +18,8 @@ interface EffectOption {
     useDataAverage: boolean;
     useDataAcoustic: boolean;
     useEffect: string;
+    effectOnlyHead: boolean;
+    effectRaindrop: boolean;
     followResize: boolean;
     followResizeElement?: string;
 }

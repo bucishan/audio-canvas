@@ -9,6 +9,8 @@ const EffectOptionDefault = {
     useDataAverage: true,
     useDataAcoustic: true,
     useEffect: 'default',
+    effectOnlyHead: false,
+    effectRaindrop: false,
     followResize: false,
 };
 class Config {
@@ -21,17 +23,40 @@ class Config {
     }
 }
 
-// canvas绘制圆角矩形
-const roundedRect = (canvasCtx, x, y, width, height, radius) => {
+// canvas 绘制柱子
+const drawStick = (canvasCtx, x, y, width, height, radius, onlyTop = false) => {
     canvasCtx.beginPath();
     if (height / 2 < radius) {
-        radius = 0;
+        radius = height / 2;
+        // radius = 0;
     }
     if (width > 0 && height > 0) {
         canvasCtx.moveTo(x + radius, y);
         canvasCtx.arcTo(x + width, y, x + width, y + height, radius);
-        canvasCtx.arcTo(x + width, y + height, x, y + height, radius);
-        canvasCtx.arcTo(x, y + height, x, y, radius);
+        // canvasCtx.arcTo(x + width, y + height, x, y + height, radius);
+        if (onlyTop) {
+            canvasCtx.lineTo(x + width, y + height);
+            canvasCtx.lineTo(x, y + height);
+        }
+        else {
+            canvasCtx.arcTo(x + width, y + height, x, y + height, radius);
+            canvasCtx.arcTo(x, y + height, x, y, radius);
+        }
+        canvasCtx.arcTo(x, y, x + radius, y, radius);
+    }
+    canvasCtx.closePath();
+    canvasCtx.fill();
+};
+// 倒雨滴
+const raindrop = (canvasCtx, x, y, width, height, radius) => {
+    canvasCtx.beginPath();
+    if (height / 2 < radius) {
+        radius = height / 2;
+    }
+    if (width > 0 && height > 0) {
+        canvasCtx.moveTo(x + radius, y);
+        canvasCtx.arcTo(x + width, y, x + width, y + height, radius);
+        canvasCtx.lineTo(x + radius, y + height);
         canvasCtx.arcTo(x, y, x + radius, y, radius);
     }
     canvasCtx.closePath();
@@ -102,7 +127,7 @@ const jumpCricle = (canvasCtx, audioByteData, petal, radius, pole, α) => {
  *
  */
 const getAudioDataArray = (audioByteData, barCount, useDataAcoustic, useDataAverage) => {
-    let audioDataArray = audioByteData.slice(0, audioByteData.length / 2);
+    let audioDataArray = audioByteData.slice(0, audioByteData.length / 3);
     if (useDataAcoustic) {
         const dataArrayReverse = [...audioDataArray].reverse();
         audioDataArray = new Uint8Array([...dataArrayReverse, ...audioDataArray]);
@@ -149,7 +174,8 @@ const getAudioDataArray = (audioByteData, barCount, useDataAcoustic, useDataAver
 //     return data
 // }
 var utils = {
-    roundedRect,
+    drawStick,
+    raindrop,
     jumpCricle,
     getAudioDataArray,
 };
@@ -176,13 +202,18 @@ const drawPI = (base, effectOption) => {
         const data = audioDataArrayStep[i];
         const barHeight = data * (height / 2 - effectOption.circleRadius) / 255 || effectOption.barMinHeight;
         (_o = effectOption.canvasCtx) === null || _o === void 0 ? void 0 : _o.rotate(2 * Math.PI / effectOption.barCount);
-        utils.roundedRect(effectOption.canvasCtx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+        if (effectOption.effectRaindrop) {
+            utils.raindrop(effectOption.canvasCtx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+        }
+        else {
+            utils.drawStick(effectOption.canvasCtx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
+        }
     }
     (_p = effectOption.canvasCtx) === null || _p === void 0 ? void 0 : _p.restore();
 };
 //绘制柱状图
 const drawChart = (base, effectOption) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     (_a = base.analyser) === null || _a === void 0 ? void 0 : _a.getByteFrequencyData(base.audioByteData);
     const { audioDataArrayStep } = utils.getAudioDataArray(base.audioByteData, effectOption.barCount, effectOption.useDataAcoustic, effectOption.useDataAverage);
     const { width, height } = effectOption.canvasOption;
@@ -200,7 +231,13 @@ const drawChart = (base, effectOption) => {
         const barHeight = (data / 255) * height;
         const x = i * (width - effectOption.barWidth) / (effectOption.barCount - 1);
         const y = height - barHeight;
-        (_k = effectOption.canvasCtx) === null || _k === void 0 ? void 0 : _k.fillRect(x, y, effectOption.barWidth, barHeight);
+        // effectOption.canvasCtx?.fillRect(x, y, effectOption.barWidth, barHeight);
+        if (effectOption.effectRaindrop) {
+            utils.raindrop(effectOption.canvasCtx, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+        }
+        else {
+            utils.drawStick(effectOption.canvasCtx, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
+        }
     }
 };
 // 绘制跳动的圆圈
