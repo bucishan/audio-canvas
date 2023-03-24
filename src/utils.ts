@@ -116,17 +116,16 @@ const jumpCricle = (canvasCtx: CanvasRenderingContext2D, audioByteData: Array<nu
  * 
  */
 const getAudioDataArray = (audioByteData: Uint8Array, barCount: number, useDataAcoustic: boolean, useDataAverage: boolean)
-    : { step: number, audioDataArray: Uint8Array, audioDataArrayStep: Uint8Array } => {
+    : { audioDataArray: Uint8Array, audioDataArrayStep: Uint8Array } => {
 
-    let audioDataArray = audioByteData.slice(0, audioByteData.length / 3);
-    if (useDataAcoustic) {
-        const dataArrayReverse = [...audioDataArray].reverse();
-        audioDataArray = new Uint8Array([...dataArrayReverse, ...audioDataArray])
-    }
-    const step = Math.round(audioDataArray.length / barCount);
+    const audioDataArray = audioByteData.slice(0, audioByteData.length / 3);
+
+    const getBarCount = useDataAcoustic ? barCount / 2 : barCount;
+    const step = Math.floor(audioDataArray.length / getBarCount);
 
     // 按跨度返回数组
     let audioDataArrayStep = new Uint8Array(barCount);
+    let audioDataArrayStepTemp = new Uint8Array(getBarCount);
     let index = 0;
     let sum = 0;
 
@@ -134,7 +133,7 @@ const getAudioDataArray = (audioByteData: Uint8Array, barCount: number, useDataA
         const value = audioDataArray[i];
         if (useDataAverage) {
             if ((i + 1) % step === 0) {
-                audioDataArrayStep[index] = sum / step;
+                audioDataArrayStepTemp[index] = sum / step;
                 sum = 0;
                 index++;
             } else {
@@ -142,14 +141,19 @@ const getAudioDataArray = (audioByteData: Uint8Array, barCount: number, useDataA
             }
         } else {
             if (i === 0 || (i + 1) % step === 0) {
-                audioDataArrayStep[index] = value;
+                audioDataArrayStepTemp[index] = value;
                 index++;
             }
         }
     }
+    if (useDataAcoustic) {
+        const dataArrayReverse = [...audioDataArrayStepTemp].reverse();
+        audioDataArrayStep = new Uint8Array([...dataArrayReverse, ...audioDataArrayStepTemp])
+    } else {
+        audioDataArrayStep = audioDataArrayStepTemp;
+    }
 
     return {
-        step,
         audioDataArray,
         audioDataArrayStep,
     };
