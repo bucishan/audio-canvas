@@ -77,8 +77,10 @@ class AudioCanvas extends Config {
             }
             window.addEventListener('resize', this.winResize.bind(this), false);
 
-            this.audio.addEventListener('play', this.audioPlay.bind(this), false);
-            this.audio.addEventListener('pause', this.audioPause.bind(this), false);
+            this.audio.onplay = this.audioPlay.bind(this);
+            this.audio.onpause = this.audioPause.bind(this);
+            // this.audio.addEventListener('play', this.audioPlay.bind(this), false);
+            // this.audio.addEventListener('pause', this.audioPause.bind(this), false);
             this.isInit = true;
         } catch (error) {
             console.error('error :>> ', error || 'init error');

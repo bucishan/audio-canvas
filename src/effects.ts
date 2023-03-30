@@ -9,36 +9,38 @@ const drawPI = (base: Config, effectOption: EffectOption) => {
     const { audioDataArrayStep } = utils.getAudioDataArray(base.audioByteData!, effectOption.barCount, effectOption.useDataAcoustic, effectOption.useDataAverage);
     const { width, height } = effectOption.canvasOption;
 
-    effectOption.canvasCtx?.clearRect(0, 0, width, height);
+    const ctx = effectOption.canvasCtx!;
 
-    effectOption.gradient = effectOption.canvasCtx?.createLinearGradient(0, -effectOption.circleRadius, 0, -Math.min(width, height) / 2);
+    ctx.clearRect(0, 0, width, height);
+
+    effectOption.gradient = ctx.createLinearGradient(0, -effectOption.circleRadius, 0, -Math.min(width, height) / 2);
     effectOption.gradient?.addColorStop(0, '#40E0D0');
     effectOption.gradient?.addColorStop(0.5, '#FF8C00');
     effectOption.gradient?.addColorStop(1, '#FF0080');
-    effectOption.canvasCtx?.beginPath();
+    ctx.beginPath();
 
-    effectOption.canvasCtx?.arc(width / 2, height / 2, effectOption.circleRadius - 5, 0, Math.PI * 2, false);
-    effectOption.canvasCtx!.strokeStyle = effectOption.gradient!;
-    effectOption.canvasCtx?.closePath();
-    effectOption.canvasCtx?.stroke();
+    ctx.arc(width / 2, height / 2, effectOption.circleRadius - 5, 0, Math.PI * 2, false);
+    ctx.strokeStyle = effectOption.gradient!;
+    ctx.closePath();
+    ctx.stroke();
 
-    effectOption.canvasCtx?.save();
-    effectOption.canvasCtx?.translate(width / 2, height / 2);
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
 
-    effectOption.canvasCtx!.fillStyle = effectOption.fillStyle || effectOption.gradient!;
+    ctx.fillStyle = effectOption.fillStyle || effectOption.gradient!;
 
     for (let i = 0; i < effectOption.barCount; i++) {
         const data = audioDataArrayStep[i];
         const barHeight = data * (height / 2 - effectOption.circleRadius) / 255 || effectOption.barMinHeight;
 
-        effectOption.canvasCtx?.rotate(2 * Math.PI / effectOption.barCount);
+        ctx.rotate(2 * Math.PI / effectOption.barCount);
         if (effectOption.effectRaindrop) {
-            utils.raindrop(effectOption.canvasCtx!, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+            utils.raindrop(ctx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
         } else {
-            utils.drawStick(effectOption.canvasCtx!, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
+            utils.drawStick(ctx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
         }
     }
-    effectOption.canvasCtx?.restore();
+    ctx.restore();
 }
 
 //绘制柱状图
@@ -48,16 +50,19 @@ const drawChart = (base: Config, effectOption: EffectOption) => {
     const { audioDataArrayStep } = utils.getAudioDataArray(base.audioByteData!, effectOption.barCount, effectOption.useDataAcoustic, effectOption.useDataAverage);
 
     const { width, height } = effectOption.canvasOption;
-    effectOption.canvasCtx?.clearRect(0, 0, width, height);
 
-    effectOption.gradient = effectOption.canvasCtx?.createLinearGradient(0, 0, 0, Math.min(width, height));
+    const ctx = effectOption.canvasCtx!;
+
+    ctx.clearRect(0, 0, width, height);
+
+    effectOption.gradient = ctx.createLinearGradient(0, 0, 0, Math.min(width, height));
     effectOption.gradient?.addColorStop(0, '#8360c3');
     effectOption.gradient?.addColorStop(0.2, '#8A2387');
     effectOption.gradient?.addColorStop(0.4, '#E94057');
     effectOption.gradient?.addColorStop(0.6, '#F27121');
     effectOption.gradient?.addColorStop(0.8, '#92FE9D');
     effectOption.gradient?.addColorStop(1, '#00C9FF');
-    effectOption.canvasCtx!.fillStyle = effectOption.fillStyle || effectOption.gradient!;
+    ctx.fillStyle = effectOption.fillStyle || effectOption.gradient!;
 
     for (let i = 0; i < effectOption.barCount; i++) {
         const data = audioDataArrayStep[i];
@@ -67,9 +72,9 @@ const drawChart = (base: Config, effectOption: EffectOption) => {
         const y = height - barHeight;
         // effectOption.canvasCtx?.fillRect(x, y, effectOption.barWidth, barHeight);
         if (effectOption.effectRaindrop) {
-            utils.raindrop(effectOption.canvasCtx!, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+            utils.raindrop(ctx, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
         } else {
-            utils.drawStick(effectOption.canvasCtx!, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
+            utils.drawStick(ctx, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
         }
     }
 }

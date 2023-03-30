@@ -128,11 +128,6 @@ const jumpCricle = (canvasCtx, audioByteData, petal, radius, pole, α) => {
  */
 const getAudioDataArray = (audioByteData, barCount, useDataAcoustic, useDataAverage) => {
     const audioDataArray = audioByteData.slice(0, audioByteData.length / 3);
-    // if (useDataAcoustic) {
-    //     const dataArrayReverse = [...audioDataArray].reverse();
-    //     audioDataArray = new Uint8Array([...dataArrayReverse, ...audioDataArray])
-    // }
-    // const step = Math.floor(audioDataArray.length / barCount);
     const getBarCount = useDataAcoustic ? barCount / 2 : barCount;
     const step = Math.floor(audioDataArray.length / getBarCount);
     // 按跨度返回数组
@@ -190,51 +185,53 @@ var utils = {
 };
 
 const drawPI = (base, effectOption) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
+    var _a, _b, _c, _d;
     (_a = base.analyser) === null || _a === void 0 ? void 0 : _a.getByteFrequencyData(base.audioByteData);
     const { audioDataArrayStep } = utils.getAudioDataArray(base.audioByteData, effectOption.barCount, effectOption.useDataAcoustic, effectOption.useDataAverage);
     const { width, height } = effectOption.canvasOption;
-    (_b = effectOption.canvasCtx) === null || _b === void 0 ? void 0 : _b.clearRect(0, 0, width, height);
-    effectOption.gradient = (_c = effectOption.canvasCtx) === null || _c === void 0 ? void 0 : _c.createLinearGradient(0, -effectOption.circleRadius, 0, -Math.min(width, height) / 2);
-    (_d = effectOption.gradient) === null || _d === void 0 ? void 0 : _d.addColorStop(0, '#40E0D0');
-    (_e = effectOption.gradient) === null || _e === void 0 ? void 0 : _e.addColorStop(0.5, '#FF8C00');
-    (_f = effectOption.gradient) === null || _f === void 0 ? void 0 : _f.addColorStop(1, '#FF0080');
-    (_g = effectOption.canvasCtx) === null || _g === void 0 ? void 0 : _g.beginPath();
-    (_h = effectOption.canvasCtx) === null || _h === void 0 ? void 0 : _h.arc(width / 2, height / 2, effectOption.circleRadius - 5, 0, Math.PI * 2, false);
-    effectOption.canvasCtx.strokeStyle = effectOption.gradient;
-    (_j = effectOption.canvasCtx) === null || _j === void 0 ? void 0 : _j.closePath();
-    (_k = effectOption.canvasCtx) === null || _k === void 0 ? void 0 : _k.stroke();
-    (_l = effectOption.canvasCtx) === null || _l === void 0 ? void 0 : _l.save();
-    (_m = effectOption.canvasCtx) === null || _m === void 0 ? void 0 : _m.translate(width / 2, height / 2);
-    effectOption.canvasCtx.fillStyle = effectOption.fillStyle || effectOption.gradient;
+    const ctx = effectOption.canvasCtx;
+    ctx.clearRect(0, 0, width, height);
+    effectOption.gradient = ctx.createLinearGradient(0, -effectOption.circleRadius, 0, -Math.min(width, height) / 2);
+    (_b = effectOption.gradient) === null || _b === void 0 ? void 0 : _b.addColorStop(0, '#40E0D0');
+    (_c = effectOption.gradient) === null || _c === void 0 ? void 0 : _c.addColorStop(0.5, '#FF8C00');
+    (_d = effectOption.gradient) === null || _d === void 0 ? void 0 : _d.addColorStop(1, '#FF0080');
+    ctx.beginPath();
+    ctx.arc(width / 2, height / 2, effectOption.circleRadius - 5, 0, Math.PI * 2, false);
+    ctx.strokeStyle = effectOption.gradient;
+    ctx.closePath();
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    ctx.fillStyle = effectOption.fillStyle || effectOption.gradient;
     for (let i = 0; i < effectOption.barCount; i++) {
         const data = audioDataArrayStep[i];
         const barHeight = data * (height / 2 - effectOption.circleRadius) / 255 || effectOption.barMinHeight;
-        (_o = effectOption.canvasCtx) === null || _o === void 0 ? void 0 : _o.rotate(2 * Math.PI / effectOption.barCount);
+        ctx.rotate(2 * Math.PI / effectOption.barCount);
         if (effectOption.effectRaindrop) {
-            utils.raindrop(effectOption.canvasCtx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+            utils.raindrop(ctx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
         }
         else {
-            utils.drawStick(effectOption.canvasCtx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
+            utils.drawStick(ctx, -effectOption.barWidth / 2, -effectOption.circleRadius - barHeight, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
         }
     }
-    (_p = effectOption.canvasCtx) === null || _p === void 0 ? void 0 : _p.restore();
+    ctx.restore();
 };
 //绘制柱状图
 const drawChart = (base, effectOption) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+    var _a, _b, _c, _d, _e, _f, _g;
     (_a = base.analyser) === null || _a === void 0 ? void 0 : _a.getByteFrequencyData(base.audioByteData);
     const { audioDataArrayStep } = utils.getAudioDataArray(base.audioByteData, effectOption.barCount, effectOption.useDataAcoustic, effectOption.useDataAverage);
     const { width, height } = effectOption.canvasOption;
-    (_b = effectOption.canvasCtx) === null || _b === void 0 ? void 0 : _b.clearRect(0, 0, width, height);
-    effectOption.gradient = (_c = effectOption.canvasCtx) === null || _c === void 0 ? void 0 : _c.createLinearGradient(0, 0, 0, Math.min(width, height));
-    (_d = effectOption.gradient) === null || _d === void 0 ? void 0 : _d.addColorStop(0, '#8360c3');
-    (_e = effectOption.gradient) === null || _e === void 0 ? void 0 : _e.addColorStop(0.2, '#8A2387');
-    (_f = effectOption.gradient) === null || _f === void 0 ? void 0 : _f.addColorStop(0.4, '#E94057');
-    (_g = effectOption.gradient) === null || _g === void 0 ? void 0 : _g.addColorStop(0.6, '#F27121');
-    (_h = effectOption.gradient) === null || _h === void 0 ? void 0 : _h.addColorStop(0.8, '#92FE9D');
-    (_j = effectOption.gradient) === null || _j === void 0 ? void 0 : _j.addColorStop(1, '#00C9FF');
-    effectOption.canvasCtx.fillStyle = effectOption.fillStyle || effectOption.gradient;
+    const ctx = effectOption.canvasCtx;
+    ctx.clearRect(0, 0, width, height);
+    effectOption.gradient = ctx.createLinearGradient(0, 0, 0, Math.min(width, height));
+    (_b = effectOption.gradient) === null || _b === void 0 ? void 0 : _b.addColorStop(0, '#8360c3');
+    (_c = effectOption.gradient) === null || _c === void 0 ? void 0 : _c.addColorStop(0.2, '#8A2387');
+    (_d = effectOption.gradient) === null || _d === void 0 ? void 0 : _d.addColorStop(0.4, '#E94057');
+    (_e = effectOption.gradient) === null || _e === void 0 ? void 0 : _e.addColorStop(0.6, '#F27121');
+    (_f = effectOption.gradient) === null || _f === void 0 ? void 0 : _f.addColorStop(0.8, '#92FE9D');
+    (_g = effectOption.gradient) === null || _g === void 0 ? void 0 : _g.addColorStop(1, '#00C9FF');
+    ctx.fillStyle = effectOption.fillStyle || effectOption.gradient;
     for (let i = 0; i < effectOption.barCount; i++) {
         const data = audioDataArrayStep[i];
         const barHeight = (data / 255) * height;
@@ -242,10 +239,10 @@ const drawChart = (base, effectOption) => {
         const y = height - barHeight;
         // effectOption.canvasCtx?.fillRect(x, y, effectOption.barWidth, barHeight);
         if (effectOption.effectRaindrop) {
-            utils.raindrop(effectOption.canvasCtx, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
+            utils.raindrop(ctx, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2);
         }
         else {
-            utils.drawStick(effectOption.canvasCtx, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
+            utils.drawStick(ctx, x, y, effectOption.barWidth, barHeight, effectOption.barWidth / 2, effectOption.effectOnlyHead);
         }
     }
 };
@@ -380,8 +377,10 @@ class AudioCanvas extends Config {
                 Object.assign(effectOption.canvas, effectOption.canvasOption);
             }
             window.addEventListener('resize', this.winResize.bind(this), false);
-            this.audio.addEventListener('play', this.audioPlay.bind(this), false);
-            this.audio.addEventListener('pause', this.audioPause.bind(this), false);
+            this.audio.onplay = this.audioPlay.bind(this);
+            this.audio.onpause = this.audioPause.bind(this);
+            // this.audio.addEventListener('play', this.audioPlay.bind(this), false);
+            // this.audio.addEventListener('pause', this.audioPause.bind(this), false);
             this.isInit = true;
         }
         catch (error) {
