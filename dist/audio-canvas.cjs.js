@@ -357,30 +357,36 @@ class AudioCanvas extends Config {
             return;
         }
         try {
-            var AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.audioCtx = new AudioContext();
-            this.source = (_a = this.audioCtx) === null || _a === void 0 ? void 0 : _a.createMediaElementSource(this.audio);
-            this.analyser = (_b = this.audioCtx) === null || _b === void 0 ? void 0 : _b.createAnalyser();
-            this.analyser.fftSize = this.fftSize;
-            this.audioByteData = new Uint8Array(this.analyser.frequencyBinCount);
-            (_c = this.source) === null || _c === void 0 ? void 0 : _c.connect(this.analyser);
-            (_d = this.analyser) === null || _d === void 0 ? void 0 : _d.connect(this.audioCtx.destination);
-            //遍历初始化canvas
-            for (let index = 0; index < this.effectOptions.length; index++) {
-                this.effectOptions[index] = Object.assign({}, EffectOptionDefault, this.effectOptions[index]);
-                const effectOption = this.effectOptions[index];
-                if (!effectOption.canvas) {
-                    console.error('the canvas element is undefined');
-                    return;
+            if (typeof window.AudioContext !== 'undefined') {
+                var AudioContext = window.AudioContext;
+                this.audioCtx = new AudioContext();
+                this.source = (_a = this.audioCtx) === null || _a === void 0 ? void 0 : _a.createMediaElementSource(this.audio);
+                this.analyser = (_b = this.audioCtx) === null || _b === void 0 ? void 0 : _b.createAnalyser();
+                this.analyser.fftSize = this.fftSize;
+                this.audioByteData = new Uint8Array(this.analyser.frequencyBinCount);
+                (_c = this.source) === null || _c === void 0 ? void 0 : _c.connect(this.analyser);
+                (_d = this.analyser) === null || _d === void 0 ? void 0 : _d.connect(this.audioCtx.destination);
+                //遍历初始化canvas
+                for (let index = 0; index < this.effectOptions.length; index++) {
+                    this.effectOptions[index] = Object.assign({}, EffectOptionDefault, this.effectOptions[index]);
+                    const effectOption = this.effectOptions[index];
+                    if (!effectOption.canvas) {
+                        console.error('the canvas element is undefined');
+                        return;
+                    }
+                    effectOption.canvasCtx = effectOption.canvas.getContext('2d');
+                    Object.assign(effectOption.canvas, effectOption.canvasOption);
                 }
-                effectOption.canvasCtx = effectOption.canvas.getContext('2d');
-                Object.assign(effectOption.canvas, effectOption.canvasOption);
+                window.addEventListener('resize', this.winResize.bind(this), false);
+                this.audio.onplay = this.audioPlay.bind(this);
+                this.audio.onpause = this.audioPause.bind(this);
+                // this.audio.addEventListener('play', this.audioPlay.bind(this), false);
+                // this.audio.addEventListener('pause', this.audioPause.bind(this), false);
             }
-            window.addEventListener('resize', this.winResize.bind(this), false);
-            this.audio.onplay = this.audioPlay.bind(this);
-            this.audio.onpause = this.audioPause.bind(this);
-            // this.audio.addEventListener('play', this.audioPlay.bind(this), false);
-            // this.audio.addEventListener('pause', this.audioPause.bind(this), false);
+            else {
+                // 不支持 AudioContext
+                console.error('error :>> 不支持 AudioContext');
+            }
             this.isInit = true;
         }
         catch (error) {

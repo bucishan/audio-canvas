@@ -49,38 +49,44 @@ class AudioCanvas extends Config {
         }
 
         try {
-            var AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-            this.audioCtx = new AudioContext();
 
-            this.source = this.audioCtx?.createMediaElementSource(this.audio);
-            this.analyser = this.audioCtx?.createAnalyser();
-            this.analyser!.fftSize = this.fftSize;
+            if (typeof window.AudioContext !== 'undefined') {
+                var AudioContext = window.AudioContext;
+                this.audioCtx = new AudioContext();
 
-            this.audioByteData = new Uint8Array(this.analyser!.frequencyBinCount);
-            this.source?.connect(this.analyser!);
-            this.analyser?.connect(this.audioCtx!.destination);
+                this.source = this.audioCtx?.createMediaElementSource(this.audio);
+                this.analyser = this.audioCtx?.createAnalyser();
+                this.analyser!.fftSize = this.fftSize;
 
-            //遍历初始化canvas
-            for (let index = 0; index < this.effectOptions.length; index++) {
+                this.audioByteData = new Uint8Array(this.analyser!.frequencyBinCount);
+                this.source?.connect(this.analyser!);
+                this.analyser?.connect(this.audioCtx!.destination);
 
-                this.effectOptions[index] = Object.assign({}, EffectOptionDefault, this.effectOptions[index]);
-                const effectOption = this.effectOptions[index];
+                //遍历初始化canvas
+                for (let index = 0; index < this.effectOptions.length; index++) {
 
-                if (!effectOption.canvas) {
-                    console.error('the canvas element is undefined');
-                    return;
+                    this.effectOptions[index] = Object.assign({}, EffectOptionDefault, this.effectOptions[index]);
+                    const effectOption = this.effectOptions[index];
+
+                    if (!effectOption.canvas) {
+                        console.error('the canvas element is undefined');
+                        return;
+                    }
+
+                    effectOption.canvasCtx = effectOption.canvas.getContext('2d')!;
+
+                    Object.assign(effectOption.canvas!, effectOption.canvasOption);
                 }
+                window.addEventListener('resize', this.winResize.bind(this), false);
 
-                effectOption.canvasCtx = effectOption.canvas.getContext('2d')!;
-
-                Object.assign(effectOption.canvas!, effectOption.canvasOption);
+                this.audio.onplay = this.audioPlay.bind(this);
+                this.audio.onpause = this.audioPause.bind(this);
+                // this.audio.addEventListener('play', this.audioPlay.bind(this), false);
+                // this.audio.addEventListener('pause', this.audioPause.bind(this), false);
+            } else {
+                // 不支持 AudioContext
+                console.error('error :>> 不支持 AudioContext');
             }
-            window.addEventListener('resize', this.winResize.bind(this), false);
-
-            this.audio.onplay = this.audioPlay.bind(this);
-            this.audio.onpause = this.audioPause.bind(this);
-            // this.audio.addEventListener('play', this.audioPlay.bind(this), false);
-            // this.audio.addEventListener('pause', this.audioPause.bind(this), false);
             this.isInit = true;
         } catch (error) {
             console.error('error :>> ', error || 'init error');
